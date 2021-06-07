@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding='utf-8'?>
+<odoo>
+
+	<report
+		id="bir_form_2307"
+		string="BIR Form 2307"
+		model="account.move"
+		report_type="qweb-pdf"
+		name="bir_module.form_2307"
+		file="bir_module.form_2307"/>
+
+	<template id="form_2307">
+		<t t-call='web.basic_layout'>
+			<t t-foreach="docs" t-as="doc">
+				<div class="page" style="height:393.5mm;">
+					<img src="/bir_module/static/img/2307.jpg" style="width:270mm;height:388mm;position:absolute;z-index:-1;"/>
+
+					<t t-set='company' t-value="request.env['res.company'].search([('id', '=', doc.company_id.id)])"/>
+					<t t-set='payor' t-value="request.env['res.partner'].search([('id', '=', company.partner_id.id)])"/>
+					<t t-set='payee' t-value="request.env['res.partner'].search([('id', '=', doc.partner_id.id)])"/>
+					<!-- <t t-esc="company.name"/><br/>
+					<t t-esc="detail.name"/><br/> -->
+
+					<div class="header" style="height:142mm;width:270mm;">
+						<div style="padding-top:45mm"><t t-esc="payee.vat"/></div>
+						<div style="padding-top:3mm;padding-left:45mm"><t t-esc="payee.name"/></div>
+						<div style="padding-top:6mm;padding-left:45mm">
+							<t t-esc="payee.street + ', ' + payee.city"/>
+							<t t-esc="payee.zip"/>
+						</div>
+						
+						<div style="padding-top:17mm"><t t-esc="payor.vat"/></div>
+						<div style="padding-top:3mm;padding-left:45mm"><t t-esc="payor.name"/></div>
+						<div style="padding-top:6mm;padding-left:45mm">
+							<t t-esc="payor.street + ', ' + payor.city"/>
+							<t t-esc="payor.zip"/>
+						</div>
+					</div>
+					<!-- <t t-esc="doc.company_id.id"/> -->
+					<t t-set="quarter" t-value="env['account.move'].get_bir_quarter(doc.date)"/>
+					<div class="container" style="padding-top:143mm;font-size:15px;">
+						<t t-foreach="request.env['account.move.line'].search([('move_id', '=', doc.id)])" t-as="obj">
+							<div class="row">
+								<t t-set="qrtr1" t-value="'0'"/>
+								<t t-set="qrtr2" t-value="'0'"/>
+								<t t-set="qrtr3" t-value="'0'"/>
+								<t t-if="quarter == 1">
+									<t t-set="qrtr1" t-value="obj.price_subtotal"/>
+								</t>
+								<t t-if="quarter == 2">
+									<t t-set="qrtr2" t-value="obj.price_subtotal"/>
+								</t>
+								<t t-if="quarter == 3">
+									<t t-set="qrtr3" t-value="obj.price_subtotal"/>
+								</t>
+
+								<t t-if="obj.exclude_from_invoice_tab == false">
+									<t t-set='percent'/>
+									<!-- <td><t t-esc='obj.name'/></td> -->
+									<!-- <t t-set='line' t-value="obj.name"/> -->
+									<t t-foreach="obj.tax_ids" t-as="tax">
+										<t t-if="'EWT' in tax.name">
+											<div style="width:67mm;text-align:center;"><t t-esc="tax.name"/></div>
+											<div style="width:25mm;text-align:center;"></div>
+											<t t-set='percent' t-value="tax.amount"/>
+											<!-- <t t-set="tax_val" t-value="request.env['account.tax'].search([('id', '=', tax.id)])"/> -->
+											<!-- <t t-esc="tax_val.name"/> -->
+										</t>
+									</t>
+											
+									<div style="width:32.5mm;text-align:center;"><t t-esc='qrtr1'/></div>
+									<div style="width:32.5mm;text-align:center;"><t t-esc='qrtr2'/></div>
+									<div style="width:32.5mm;text-align:center;"><t t-esc='qrtr3'/></div>
+									<div style="width:32.5mm;text-align:center;"><t t-esc='int(qrtr1) + int(qrtr2) + int(qrtr3)'/></div>
+									<div style="width:50mm;text-align:center;"><t t-esc='(int(qrtr1) + int(qrtr2) + int(qrtr3)) * (abs(int(percent)) / 100)'/></div>
+								</t>
+							</div>
+						</t>
+					</div>
+					<!-- <t t-esc='header'/> -->
+					<!-- <t t-esc='line'/> -->
+					<p style="page-break-before:always;"></p>
+				</div>
+			</t>
+		</t>
+	</template>
+</odoo>
