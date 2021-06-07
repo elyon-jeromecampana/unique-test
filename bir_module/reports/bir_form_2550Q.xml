@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding='utf-8'?>
+<odoo>
+
+	<report
+		id="bir_form_2550Q"
+		string="BIR Form 2550Q"
+		model="account.move"
+		report_type="qweb-pdf"
+		name="bir_module.form_2550Q"
+		file="bir_module.form_2550Q"/>
+
+	<template id="form_2550Q">
+		<t t-call='web.basic_layout'>
+			<t t-foreach="docs" t-as="doc">
+				<div class="page" style="height:392mm;">
+					<img src="/bir_module/static/img/2550Q.jpg" style="width:270mm;height:388mm;position:absolute;z-index:-1;"/>
+					<t t-set="sales" t-value="env['account.move'].month_or_quarter(doc.date)"/>
+					<!-- <t t-set="purchase" t-value="env['account.move'].get_monthly_purchase_vat(doc.date)"/> -->
+
+					<t t-set='company' t-value="request.env['res.company'].search([('id', '=', doc.company_id.id)])"/>
+					<t t-set='payor' t-value="request.env['res.partner'].search([('id', '=', company.partner_id.id)])"/>
+					<div class="header" style="height:80.5mm;width:270mm;">
+						<div style="padding-top:43.5mm;padding-left:20mm"><t t-esc="payor.vat"/></div>
+						<div style="padding-top:4.5mm;padding-left:15mm"><t t-esc="payor.name"/></div>
+						<div style="padding-top:4.5mm;padding-left:15mm">
+							<t t-esc="payor.street + ', ' + payor.city"/>
+							<t t-esc="payor.zip"/>
+						</div>
+					</div>
+
+					<div class="container" style="padding-top:87.3mm;height:280mm;width:270mm;font-size:11px;text-align:center;">
+						<div class="row">
+							<div style="width:135mm;"></div>
+							<div style="width:60mm;padding:0px;"><t t-esc="sales[1]"/></div>
+							<div style="width:60mm;padding:0px;margin-left:8mm;"><t t-esc="sales[0]"/></div>
+						</div>
+						<div class="row">
+							<div style="width:135mm;"></div>
+							<div style="width:60mm;padding:0px;"><t t-esc="sales[3]"/></div>
+							<div style="width:60mm;padding:0px;margin-left:8mm;"><t t-esc="sales[2]"/></div>
+						</div>
+						<div class="row">
+							<div style="width:135mm;"></div>
+							<div style="width:60mm;padding:0px;"><t t-esc="sales[4]"/></div>
+						</div>
+						<div class="row" style="margin-top:4mm;">
+							<div style="width:135mm;"></div>
+							<div style="width:60mm;padding:0px;"><t t-esc="sales[5]"/></div>
+							<div style="width:60mm;padding:0px;margin-left:8mm;"><t t-esc="sales[6]"/></div>
+						</div>
+
+
+						<!-- <t t-esc="sales"/> -->
+						<!-- <t t-esc="purchase"/> -->
+					</div>
+					<p style="page-break-before:always;"></p>
+				</div>
+			</t>
+		</t>
+	</template>
+</odoo>
