@@ -43,34 +43,6 @@ class bir_reports(models.Model):
 
         return quarter
 
-    def connect_to_postgresql(self):
-        cursor = ''
-        try:
-            con = psycopg2.connect(
-                host = 'localhost',
-                database = self._cr.dbname,
-                user = 'openpg',
-                password = 'openpgpwd')
-            con.autocommit = True
-            cursor = con.cursor()
-
-        except (Exception, psycopg2.DatabaseError) as e:
-            print(e)
-        finally:
-            return cursor
-
-    def get_query_values(self, query):
-        cursor = self.connect_to_postgresql()
-        data = []
-        try:
-            cursor.execute(query)
-            data = cursor.fetchall()
-            cursor.close()
-        except Exception as e:
-            data = "ERROR " + str(e)
-        
-        return data
-
     def get_monthly_sales_vat(self, value, const, q_index):
         doc_month = value.month
         query = "SELECT D.name,D.amount,B.price_subtotal,F.name FROM account_move A "
@@ -89,7 +61,8 @@ class bir_reports(models.Model):
         else:
             query += "WHERE EXTRACT(MONTH FROM A.date) = '" + str(doc_month) + "' AND A.move_type = 'out_invoice' AND a.state = 'posted'"
 
-        val = self.get_query_values(query)
+        self._cr.execute(query)
+        val = self._cr.fetchall()
 
         zero_rated = 0
         vat_private,private_sub,vat_govt,govt_sub = 0,0,0,0
@@ -131,7 +104,8 @@ class bir_reports(models.Model):
             ctr += 1
         query += ") AND a.state = 'posted'"
 
-        val = self.get_query_values(query)
+        self._cr.execute(query)
+        val = self._cr.fetchall()
 
         # vat_goods,goods_sub = 0,0
         # vat_service,service_sub = 0,0
@@ -148,8 +122,8 @@ class bir_reports(models.Model):
 
     def get_purchase_account(self):
         query = "SELECT name FROM bir_module_setup_2550"
-
-        return self.get_query_values(query)
+        self._cr.execute(query)
+        return self._cr.fetchall()
 
     def month_or_quarter(self, value):
         val = []

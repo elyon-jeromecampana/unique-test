@@ -56,16 +56,13 @@
  -->
 
     <!-- Top menu item -->
-
     <menuitem name="BIR Module" id="bir_module.menu_root"/>
-
+    
     <!-- menu categories -->
-
     <menuitem name="Menu 1" id="bir_module.menu_1" parent="bir_module.menu_root"/>
     <menuitem name="Configuration" id="bir_module.config" parent="bir_module.menu_root"/>
 
     <!-- actions -->
-
     <menuitem name="List" id="bir_module.menu_1_list" parent="bir_module.menu_1"
               action="bir_module.action_window"/>
     <menuitem name="2550Q/M Purchases Accounts Setup" id="bir_module" parent="bir_module.config"
